@@ -80,7 +80,7 @@ const Join = () => {
     const user = getValues("user");
     console.log(user);
     try {
-      await axios.post(`${baseUrl}/join`, { user });
+      await axios.post(`${baseUrl}/api/users/join`, { user });
     } catch (error) {
       console.log(error);
     }

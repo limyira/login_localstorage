@@ -80,7 +80,8 @@ const Login = () => {
     const user = getValues("user");
     console.log(user);
     try {
-      await axios.post(`${baseUrl}/login`, { user });
+      const response = await axios.post(`${baseUrl}/api/users/login`, { user });
+      console.log(response);
     } catch (error) {
       console.log(error);
     }

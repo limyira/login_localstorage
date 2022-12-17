@@ -6,9 +6,14 @@ import session from "express-session";
 import MongoStore from "connect-mongo";
 import User from "./model/User.js";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import cookieParser from "cookie-parser";
+import auth from "./middleware/auth.js";
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+const { sign, verify } = jwt;
+app.use(cookieParser());
 app.use(
   cors({
     origin: "http://localhost:3000",
@@ -31,7 +36,7 @@ app.use(
     }),
   })
 );
-app.post("/join", async (req, res) => {
+app.post("/api/users/join", async (req, res) => {
   const { user } = req.body;
   console.log(user);
   try {
@@ -46,7 +51,7 @@ app.post("/join", async (req, res) => {
     res.status(500).json({ err });
   }
 });
-app.post("/login", async (req, res) => {
+app.post("/api/users/login", async (req, res) => {
   const {
     user: { email, password },
   } = req.body;
@@ -59,8 +64,18 @@ app.post("/login", async (req, res) => {
     res.status(500).json("Password does not matches");
   }
   console.log(ok);
-  res.send("Login");
+  const access_token = sign(
+    userInfo._id.toHexString(),
+    process.env.ACCESS_SCRET
+  );
+  console.log(access_token);
+  res
+    .cookie("access", access_token)
+    .status(200)
+    .json({ loginSuccess: true, userID: userInfo.email });
 });
+
+app.get("/api/users/auth", auth, (req, res) => {});
 app.listen(PORT, () => {
   console.log(`Server is Running on ${PORT}!!`);
 });
