@@ -1,6 +1,7 @@
 import { useForm, useFormState } from "react-hook-form";
 import styled from "styled-components";
 import axios from "axios";
+import { Dispatch } from "react";
 const Wrapper = styled.div`
   width: 100%;
   height: 100%;
@@ -78,7 +79,6 @@ const Login = () => {
   const baseUrl = "http://localhost:3001";
   const submit = async () => {
     const user = getValues("user");
-    console.log(user);
     try {
       const response = await axios.post(`${baseUrl}/api/users/login`, { user });
       console.log(response);

@@ -57,19 +57,17 @@ app.post("/api/users/login", async (req, res) => {
   } = req.body;
   const userInfo = await User.findOne({ email });
   if (!userInfo) {
-    res.status(404).json("User does not exists");
+    return res.status(404).json("User does not exists");
   }
   const ok = await bcrypt.compare(password, userInfo.password);
   if (!ok) {
-    res.status(500).json("Password does not matches");
+    return res.status(500).json("Password does not matches");
   }
-  console.log(ok);
   const access_token = sign(
     userInfo._id.toHexString(),
     process.env.ACCESS_SCRET
   );
-  console.log(access_token);
-  res
+  return res
     .cookie("access", access_token)
     .status(200)
     .json({ loginSuccess: true, userID: userInfo.email });
