@@ -4,6 +4,13 @@ import App from "./App";
 import { createGlobalStyle } from "styled-components";
 import { RecoilRoot } from "recoil";
 import { QueryClient, QueryClientProvider } from "react-query";
+import { Provider } from "react-redux";
+import { applyMiddleware, legacy_createStore } from "redux";
+import promiseMiddleware from "redux-promise";
+import ReduxThunk from "redux-thunk";
+import rootReducer from "./reducer";
+import { composeWithDevTools } from "@redux-devtools/extension";
+
 const GlobalStyle = createGlobalStyle`
 @import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400&display=swap');
 html, body, div, span, applet, object, iframe,
@@ -67,7 +74,11 @@ a {
   color:inherit;
 }
 `;
-
+const devTools = window.__REDUX_DEVTOOLS_EXTENSION__;
+const store = legacy_createStore(
+  rootReducer,
+  composeWithDevTools(applyMiddleware(ReduxThunk, promiseMiddleware))
+);
 const client = new QueryClient();
 
 const root = ReactDOM.createRoot(
@@ -77,8 +88,10 @@ root.render(
   <RecoilRoot>
     <QueryClientProvider client={client}>
       <React.StrictMode>
-        <GlobalStyle />
-        <App />
+        <Provider store={store}>
+          <GlobalStyle />
+          <App />
+        </Provider>
       </React.StrictMode>
     </QueryClientProvider>
   </RecoilRoot>

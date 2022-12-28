@@ -1,6 +1,8 @@
 import mongoose, { mongo } from "mongoose";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
+const { sign, verify } = jwt;
 const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true },
@@ -12,6 +14,16 @@ userSchema.pre("save", async function () {
     this.password = await bcrypt.hash(this.password, 5);
   }
 });
+
+userSchema.statics.findByToken = function (token, cb) {
+  let user = this;
+  jwt.verify(token, process.env.ACCESS_SCRET, function (err, decoded) {
+    user.findOne({ _id: decoded, token: token }, (err, user) => {
+      if (err) return cb(err);
+      cb(null, user);
+    });
+  });
+};
 
 const User = mongoose.model("User", userSchema);
 

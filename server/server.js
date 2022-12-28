@@ -38,7 +38,6 @@ app.use(
 );
 app.post("/api/users/join", async (req, res) => {
   const { user } = req.body;
-  console.log(user);
   try {
     const newUser = await User.create({
       email: user.email,
@@ -52,14 +51,15 @@ app.post("/api/users/join", async (req, res) => {
   }
 });
 app.post("/api/users/login", async (req, res) => {
-  const {
-    user: { email, password },
-  } = req.body;
-  const userInfo = await User.findOne({ email });
+  const user = req.body;
+  console.log(user);
+  const userInfo = await User.findOne({ email: user.email });
+  console.log(userInfo);
   if (!userInfo) {
     return res.status(404).json("User does not exists");
   }
-  const ok = await bcrypt.compare(password, userInfo.password);
+  const ok = await bcrypt.compare(user.password, userInfo.password);
+  console.log(ok);
   if (!ok) {
     return res.status(500).json("Password does not matches");
   }
@@ -73,7 +73,26 @@ app.post("/api/users/login", async (req, res) => {
     .json({ loginSuccess: true, userID: userInfo.email });
 });
 
-app.get("/api/users/auth", auth, (req, res) => {});
+app.get("/api/users/auth", auth, (req, res) => {
+  return res.status(200).json({
+    _id: req.user._id,
+    isAuth: true,
+    email: req.user.email,
+  });
+});
+
+app.get("/api/user/logout", auth, (req, res) => {
+  User.findByIdAndUpdate(
+    { _id: req.user._id },
+    {
+      token: "",
+    },
+    (err, user) => {
+      if (err) return res.json({ success: false, err });
+      return res.status(200).json({ success: true });
+    }
+  );
+});
 app.listen(PORT, () => {
   console.log(`Server is Running on ${PORT}!!`);
 });
