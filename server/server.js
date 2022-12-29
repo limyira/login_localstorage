@@ -51,15 +51,12 @@ app.post("/api/users/join", async (req, res) => {
   }
 });
 app.post("/api/users/login", async (req, res) => {
-  const user = req.body;
-  console.log(user);
+  const { user } = req.body;
   const userInfo = await User.findOne({ email: user.email });
-  console.log(userInfo);
   if (!userInfo) {
     return res.status(404).json("User does not exists");
   }
   const ok = await bcrypt.compare(user.password, userInfo.password);
-  console.log(ok);
   if (!ok) {
     return res.status(500).json("Password does not matches");
   }

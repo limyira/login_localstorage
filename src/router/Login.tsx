@@ -1,8 +1,9 @@
 import { useForm, useFormState } from "react-hook-form";
 import styled from "styled-components";
 import axios from "axios";
-import { useDispatch } from "react-redux";
-import { loginUser } from "../actions/user_action";
+import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch } from "..";
+import { RootState } from "../reducer";
 const Wrapper = styled.div`
   width: 100%;
   height: 100%;
@@ -69,8 +70,12 @@ export interface IForm {
   };
 }
 
+interface TSuccess {}
+const baseUrl = "http://localhost:3001/api/users/login";
 const Login = () => {
+  const userSuccess = useSelector((state: RootState) => state.userState);
   const dispatch = useDispatch();
+  console.log(userSuccess);
   const {
     handleSubmit,
     watch,
@@ -80,13 +85,14 @@ const Login = () => {
   } = useForm<IForm>();
   const submit = async () => {
     const user: { email: string; password: string } = getValues("user");
-    dispatch(loginUser(user));
-    // try {
-    //   const response = await axios.post(`${baseUrl}/api/users/login`, { user });
-    //   console.log(response);
-    // } catch (error) {
-    //   console.log(error);
-    // }
+    try {
+      const response = await axios.post(`${baseUrl}`, { user });
+      const data = await response.data;
+
+      await dispatch(data);
+    } catch (error) {
+      console.log(error);
+    }
   };
   return (
     <Wrapper>

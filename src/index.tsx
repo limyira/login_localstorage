@@ -4,7 +4,7 @@ import App from "./App";
 import { createGlobalStyle } from "styled-components";
 import { RecoilRoot } from "recoil";
 import { QueryClient, QueryClientProvider } from "react-query";
-import { Provider } from "react-redux";
+import { Provider, useDispatch } from "react-redux";
 import { applyMiddleware, legacy_createStore } from "redux";
 import promiseMiddleware from "redux-promise";
 import ReduxThunk from "redux-thunk";
@@ -96,3 +96,7 @@ root.render(
     </QueryClientProvider>
   </RecoilRoot>
 );
+
+export type AppdisPatch = typeof store.dispatch;
+
+export const useAppDispatch: () => AppdisPatch = useDispatch;
