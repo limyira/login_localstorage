@@ -1,4 +1,4 @@
-import { LOGIN, TAction } from "../actions/actions";
+import { LOGIN, LOGIN_DATA, TAction } from "../actions/actions";
 
 type TinitialState = {
   userID: string;
@@ -15,9 +15,10 @@ function userState(state: TinitialState = initialState, action: TAction) {
     case LOGIN:
       return {
         ...state,
-        userId: action.payload.userID,
+        userID: action.payload.userID,
         loginSuccess: action.payload.loginSuccess,
       };
+
     default:
       return state;
   }

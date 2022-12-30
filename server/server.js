@@ -65,7 +65,10 @@ app.post("/api/users/login", async (req, res) => {
     process.env.ACCESS_SCRET
   );
   return res
-    .cookie("access", access_token)
+    .cookie("access", access_token, {
+      sameSite: "None",
+      secure: true,
+    })
     .status(200)
     .json({ loginSuccess: true, userID: userInfo.email });
 });
@@ -78,7 +81,7 @@ app.get("/api/users/auth", auth, (req, res) => {
   });
 });
 
-app.get("/api/user/logout", auth, (req, res) => {
+app.get("/api/users/logout", auth, (req, res) => {
   User.findByIdAndUpdate(
     { _id: req.user._id },
     {

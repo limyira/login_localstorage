@@ -4,6 +4,8 @@ import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { useAppDispatch } from "..";
 import { RootState } from "../reducer";
+import { loginSuccess } from "../actions/actions";
+import { useNavigate } from "react-router";
 const Wrapper = styled.div`
   width: 100%;
   height: 100%;
@@ -72,10 +74,11 @@ export interface IForm {
 
 interface TSuccess {}
 const baseUrl = "http://localhost:3001/api/users/login";
+
 const Login = () => {
   const userSuccess = useSelector((state: RootState) => state.userState);
   const dispatch = useDispatch();
-  console.log(userSuccess);
+  const nav = useNavigate();
   const {
     handleSubmit,
     watch,
@@ -86,10 +89,16 @@ const Login = () => {
   const submit = async () => {
     const user: { email: string; password: string } = getValues("user");
     try {
-      const response = await axios.post(`${baseUrl}`, { user });
+      const response = await axios.post(
+        `${baseUrl}`,
+        { user },
+        { withCredentials: true }
+      );
       const data = await response.data;
-
-      await dispatch(data);
+      await dispatch(loginSuccess(data));
+      if (data.loginSuccess) {
+        nav("/");
+      }
     } catch (error) {
       console.log(error);
     }
