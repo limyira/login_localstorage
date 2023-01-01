@@ -1,9 +1,10 @@
 import axios from "axios";
 import { useEffect } from "react";
 import { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useMatch, useNavigate } from "react-router";
 import styled from "styled-components";
+import { RootState } from "../reducer";
 
 const Wrapper = styled.div`
   width: 100%;
@@ -79,9 +80,14 @@ const Header = () => {
   const loginMatch = useMatch("/login");
   const [state, setState] = useState(1);
   const baseUrl = "http://localhost:3001/api/users/logout";
+  const user = useSelector((state: RootState) => state.authReducer);
+  const isLogin = user.isAuth;
   const logoutClick = async () => {
     const response = await axios.get(`${baseUrl}`, { withCredentials: true });
-    console.log(response);
+    console.log(response.data);
+    if (response.data.success) {
+      nav("/login");
+    }
   };
   useEffect(() => {
     if (editMatch) {
@@ -97,18 +103,26 @@ const Header = () => {
   return (
     <Wrapper>
       <Contents>
-        <Item1 match={state} onClick={() => nav("/edit")}>
-          Edit
-        </Item1>
-        <Item2 match={state} onClick={() => nav("/join")}>
-          Join
-        </Item2>
-        <Item3 match={state} onClick={() => nav("/login")}>
-          Log in
-        </Item3>
-        <Item4 match={state} onClick={logoutClick}>
-          Log out
-        </Item4>
+        {isLogin && (
+          <Item1 match={state} onClick={() => nav("/edit")}>
+            Edit
+          </Item1>
+        )}
+        {!isLogin && (
+          <Item2 match={state} onClick={() => nav("/join")}>
+            Join
+          </Item2>
+        )}
+        {!isLogin && (
+          <Item3 match={state} onClick={() => nav("/login")}>
+            Log in
+          </Item3>
+        )}
+        {isLogin && (
+          <Item4 match={state} onClick={logoutClick}>
+            Log out
+          </Item4>
+        )}
       </Contents>
     </Wrapper>
   );

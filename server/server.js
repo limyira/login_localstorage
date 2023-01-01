@@ -64,13 +64,15 @@ app.post("/api/users/login", async (req, res) => {
     userInfo._id.toHexString(),
     process.env.ACCESS_SCRET
   );
+  userInfo.token = access_token;
+  await userInfo.save();
   return res
     .cookie("access", access_token, {
       sameSite: "None",
       secure: true,
     })
     .status(200)
-    .json({ loginSuccess: true, userID: userInfo.email });
+    .json({ loginSuccess: true, userID: userInfo._id });
 });
 
 app.get("/api/users/auth", auth, (req, res) => {
@@ -82,7 +84,7 @@ app.get("/api/users/auth", auth, (req, res) => {
 });
 
 app.get("/api/users/logout", auth, (req, res) => {
-  User.findByIdAndUpdate(
+  User.findOneAndUpdate(
     { _id: req.user._id },
     {
       token: "",
