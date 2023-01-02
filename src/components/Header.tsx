@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useMatch, useNavigate } from "react-router";
 import styled from "styled-components";
 import { RootState } from "../reducer";
+import { logoutRequest } from "../actions/actions";
 
 const Wrapper = styled.div`
   width: 100%;
@@ -82,10 +83,12 @@ const Header = () => {
   const baseUrl = "http://localhost:3001/api/users/logout";
   const user = useSelector((state: RootState) => state.authReducer);
   const isLogin = user.isAuth;
+  console.log(user);
   const logoutClick = async () => {
     const response = await axios.get(`${baseUrl}`, { withCredentials: true });
     console.log(response.data);
     if (response.data.success) {
+      dispatch(logoutRequest());
       nav("/login");
     }
   };
